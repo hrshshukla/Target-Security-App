@@ -69,11 +69,21 @@ export default function EmployeeScreen() {
       {tab === "Details" ? (
         <DetailsTab
           employee={employee.data}
-           canDelete={user?.role === "ADMIN" || user?.role === "SUPERVISOR"}
+          canDelete={
+            user?.role === "ADMIN" ||
+            (user?.role === "SUPERVISOR" && employee.data.role !== "Supervisor")
+          }
           onUpdated={() => void employee.refetch()}
         />
       ) : tab === "Attendance" ? (
-        <AttendanceTab employeeId={id} />
+        <AttendanceTab
+          employeeId={id}
+          canEdit={
+            user?.role === "ADMIN" ||
+            (user?.role === "SUPERVISOR" &&
+              employee.data.role !== "Supervisor")
+          }
+        />
       ) : (
         <SalaryTab
           employeeId={id}
@@ -348,7 +358,13 @@ function formatPhoneNumber(value: string) {
   return value.trim().startsWith("+91") ? value : `+91 ${digits}`;
 }
 
-function AttendanceTab({ employeeId }: { employeeId: string }) {
+function AttendanceTab({
+  employeeId,
+  canEdit,
+}: {
+  employeeId: string;
+  canEdit: boolean;
+}) {
   const colors = useColors();
   const { showModal } = useModal();
   const today = new Date();
@@ -449,7 +465,7 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
             return (
               <Pressable
                 key={date}
-                disabled={future || update.isPending}
+                disabled={future || update.isPending || !canEdit}
                 onPress={() => changeDay(day)}
                 style={[
                   styles.dayCell,

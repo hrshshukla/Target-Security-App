@@ -1490,6 +1490,10 @@ export async function handleManagement(req: ApiRequest, res: ApiResponse): Promi
     if (!body) return true;
     const employee = await employeeForRequest(req, res);
     if (!employee) return true;
+    if (req.auth!.role === "SUPERVISOR" && employee.role === "Supervisor") {
+      sendError(res, 403, "FORBIDDEN", "Supervisors cannot edit another supervisor.");
+      return true;
+    }
     const role = req.auth!.role === "SUPERVISOR" ? "Security Guard" : body.role;
     const linkedUser = await pool.query(
      `SELECT u.id FROM users u
@@ -1575,6 +1579,10 @@ export async function handleManagement(req: ApiRequest, res: ApiResponse): Promi
     await ensureSeed();
     const employee = await employeeForRequest(req, res);
     if (!employee) return true;
+    if (req.auth!.role === "SUPERVISOR" && employee.role === "Supervisor") {
+      sendError(res, 403, "FORBIDDEN", "Supervisors cannot delete another supervisor.");
+      return true;
+    }
     const account = await pool.query(
       `SELECT u.id
        FROM users u
@@ -1685,6 +1693,10 @@ export async function handleManagement(req: ApiRequest, res: ApiResponse): Promi
     if (!body) return true;
     const employee = await employeeForRequest(req, res);
     if (!employee) return true;
+    if (req.auth!.role === "SUPERVISOR" && employee.role === "Supervisor") {
+      sendError(res, 403, "FORBIDDEN", "Supervisors cannot mark attendance for another supervisor.");
+      return true;
+    }
     const dateValue = new Date(`${req.params.date}T00:00:00Z`);
     if (Number.isNaN(dateValue.getTime()) || dateValue > new Date()) {
       sendError(res, 400, "INVALID_DATE", "Future dates cannot be marked as attendance.");
