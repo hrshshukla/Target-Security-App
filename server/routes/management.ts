@@ -431,43 +431,6 @@ async function ensureSeed() {
     ["company-tisf", "TARGET INDUSTRIAL SECURITY FORCE Pvt Ltd"],
     ["company-ke", "KARNIKA ENTERPRISES"],
   ];
-  const adminId = "user-admin";
-  const supervisorId = "user-supervisor";
-  const guardId = "user-guard";
-
-  await pool.query(
-    `INSERT INTO users (id, name, email, password_hash, role)
-      VALUES ($1, $2, $3, $4, $5), ($6, $7, $8, $9, $10), ($11, $12, $13, $14, $15)
-      ON CONFLICT (id) DO NOTHING`,
-    [
-      adminId,
-      "Aarav Mehta",
-      "admin@targetops.local",
-      hashPassword("admin123"),
-      "ADMIN",
-      supervisorId,
-      "Riya Sharma",
-      "supervisor@targetops.local",
-      hashPassword("supervisor123"),
-      "SUPERVISOR",
-      guardId,
-      "Kabir Singh",
-      "guard@targetops.local",
-      hashPassword("guard123"),
-      "SECURITY_GUARD",
-    ],
-  );
-  await pool.query(
-    `UPDATE users
-     SET mobile_number = CASE id
-       WHEN $1 THEN $2
-       WHEN $3 THEN $4
-       WHEN $5 THEN $6
-     END,
-     company_id = CASE id WHEN $5 THEN 'company-isf' ELSE company_id END
-     WHERE id IN ($1, $3, $5)`,
-    [adminId, "9000000001", supervisorId, "9000000002", guardId, "9000000003"],
-  );
 
   for (const [id, name] of companies) {
     await pool.query(
@@ -476,33 +439,6 @@ async function ensureSeed() {
       [id, name, "GSTIN pending", "Account pending", "+91 00000 00000"],
     );
   }
-
-  await pool.query(
-    `INSERT INTO company_assignments (user_id, company_id)
-     VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-    [guardId, "company-isf"],
-  );
-
-  const employees = [
-    ["employee-001", "company-isf", 1, "Kabir Singh", "9876543210", "Night Gate", "Security Guard", 28000, 24000],
-    ["employee-002", "company-isf", 2, "Ananya Rao", "9876543211", "Control Room", "Supervisor", 42000, 36000],
-    ["employee-003", "company-tis", 3, "Vikram Yadav", "9876543212", "Warehouse A", "Security Guard", 26500, 23000],
-    ["employee-004", "company-tis", 4, "Meera Nair", "9876543213", "Main Entrance", "Security Guard", 27500, 24000],
-    ["employee-005", "company-tssm", 5, "Arjun Patel", "9876543214", "Staff Parking", "Security Guard", 25000, 22000],
-    ["employee-006", "company-ke", 6, "Sana Khan", "9876543215", "Reception", "Supervisor", 39000, 33000],
-  ] as const;
-  for (const employee of employees) {
-    const [id, companyId, employeeId, name, contact, site, role, salary, basicSalary] = employee;
-    await pool.query(
-      `INSERT INTO employees
-       (id, company_id, employee_id, name, contact, salary, site, role,
-        basic_salary, allowances, overtime, pf, esic, date_of_joining)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-       ON CONFLICT (id) DO NOTHING`,
-      [id, companyId, employeeId, name, contact, salary, site, role, basicSalary, 1500, 0, 1800, 450, "2025-06-15"],
-    );
-  }
-  await pool.query("SELECT setval('employees_employee_id_seq', COALESCE((SELECT MAX(employee_id) FROM employees), 1), true)");
 
   const accountRows = [
     ["company-isf", 999999, 0, 0, 0, 0, 0],
