@@ -1,0 +1,29 @@
+Replit ko ye prompt do:
+
+> **Fix the Employee Edit feature for Supervisors.**
+>
+> Currently, when a **Supervisor** opens an employee and tries to edit/save the employee details, the app shows:
+>
+> **“Could not save — The employee was not updated.”**
+>
+> The edit feature works/should work for Admin, but Supervisor updates are currently failing. Please debug and fix the **actual backend/API + authorization + database update flow**, not just the popup.
+>
+> ### Requirements:
+>
+> * Verify that the Supervisor is correctly authorized to edit employees.
+> * Verify the correct employee ID is being sent from the React Native app to the API.
+> * Verify the Supervisor's company/organization scope and permissions before updating the employee.
+> * Check the edit employee API request, backend route, validation/schema and database update query.
+> * Make sure the employee record is actually updated in the database.
+> * If there are role-based middleware/permission checks, fix them so an authorized Supervisor can edit employees they are allowed to manage.
+> * Do **not** give Supervisor unrestricted access to employees belonging to other companies/organizations.
+> * Preserve the existing Admin permissions and behavior.
+> * If the API/database returns an error, expose a meaningful error during debugging instead of converting everything into **“The employee was not updated.”**
+> * After a successful update:
+>
+>   1. Close the edit UI/modal.
+>   2. Show the existing success popup with a message such as **“Employee updated successfully.”**
+>   3. Refresh/re-fetch the employee details so the updated information immediately appears.
+>   4. If the user returns to the Employees list, make sure the updated employee information is reflected there as well.
+>
+> **Important:** Don't just change the frontend error message or bypass the authorization check. Trace the complete Supervisor → API → authorization → database update flow and fix the root cause while keeping the existing React Native + Expo + Vercel API architecture unchanged.

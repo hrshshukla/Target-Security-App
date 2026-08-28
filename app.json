@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "Target Security",
+    "slug": "target-security",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": [
+      "android",
+      "web"
+    ],
+    "icon": "./assets/images/company-logo.png",
+    "scheme": "target-security",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/company-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A1118"
+    },
+    "android": {
+      "package": "com.targetsecurity",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/company-logo.png",
+        "backgroundColor": "#0A1118"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

@@ -1,0 +1,91 @@
+import { customFetch } from "./custom-fetch";
+import type { User } from "./generated/api.schemas";
+import { Platform } from "react-native";
+
+export type ImageKitAuth = {
+  token: string;
+  expire: number;
+  signature: string;
+  publicKey: string;
+  urlEndpoint: string;
+  folder: string;
+};
+
+export type UserDocument = {
+  id: string;
+  documentType: string;
+  imageUrl: string;
+  createdAt: string;
+};
+
+export const getImageKitAuth = (companyId?: string) =>
+  customFetch<ImageKitAuth>(
+    companyId
+      ? `/api/settings/imagekit-auth?companyId=${encodeURIComponent(companyId)}`
+      : "/api/settings/imagekit-auth",
+    { responseType: "json" },
+  );
+
+export const updateProfile = (body: {
+  name: string;
+  email?: string;
+  mobileNumber?: string | null;
+  profilePictureUrl?: string | null;
+}) => customFetch<User>("/api/settings/profile", {
+  method: "PATCH",
+  body: JSON.stringify(body),
+  responseType: "json",
+});
+
+export const updatePassword = (body: { currentPassword: string; newPassword: string }) =>
+  customFetch<void>("/api/settings/password", { method: "PATCH", body: JSON.stringify(body) });
+
+export const getDocuments = () =>
+  customFetch<UserDocument[]>("/api/settings/documents", { responseType: "json" });
+
+export const saveAadhaar = (imageUrl: string) =>
+  customFetch<UserDocument>("/api/settings/documents/aadhaar", {
+    method: "PUT",
+    body: JSON.stringify({ imageUrl }),
+    responseType: "json",
+  });
+
+export async function uploadImageToImageKit(
+  uri: string,
+  fileName: string,
+  mimeType: string,
+  companyId?: string,
+) {
+  const auth = await getImageKitAuth(companyId);
+  const form = new FormData();
+  if (Platform.OS === "web") {
+    const source = await fetch(uri);
+    if (!source.ok) throw new Error("The selected file could not be read.");
+    const blob = await source.blob();
+    form.append("file", blob, fileName);
+  } else {
+    form.append("file", { uri, name: fileName, type: mimeType } as unknown as Blob);
+  }
+  form.append("fileName", fileName);
+  form.append("publicKey", auth.publicKey);
+  form.append("signature", auth.signature);
+  form.append("expire", String(auth.expire));
+  form.append("token", auth.token);
+  form.append("folder", auth.folder);
+  form.append("useUniqueFileName", "false");
+  form.append("overwriteFile", "true");
+  const response = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+    method: "POST",
+    body: form,
+  });
+  const result = await response.json().catch(() => null) as {
+    url?: string;
+    message?: string;
+    error?: string;
+  } | null;
+  if (!response.ok) {
+    throw new Error(result?.message ?? result?.error ?? `ImageKit upload failed (HTTP ${response.status}).`);
+  }
+  if (!result?.url) throw new Error("ImageKit upload returned no URL.");
+  return result.url;
+}

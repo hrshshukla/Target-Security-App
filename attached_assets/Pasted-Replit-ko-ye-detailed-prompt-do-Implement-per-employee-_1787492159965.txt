@@ -1,0 +1,76 @@
+Replit ko ye detailed prompt do:
+
+> **Implement per-employee ImageKit folder structure for profile pictures and Aadhaar documents.**
+>
+> Currently, uploaded **profile pictures and Aadhaar images are stored randomly in ImageKit**, while only their URLs are stored in the database and mapped to the employee. I want to change this to a proper per-employee folder structure.
+>
+> ### Required ImageKit structure
+>
+> Every employee must have their own unique folder based on their **employee ID**.
+>
+> For example:
+>
+> ```text
+> /employees/
+>   /EMP-15/
+>       profile-picture.jpg
+>       aadhaar.jpg
+>
+>   /EMP-16/
+>       profile-picture.jpg
+>       aadhaar.jpg
+> ```
+>
+> Or, if the existing employee ID is numeric, use a consistent format such as:
+>
+> ```text
+> /employees/15/
+> /employees/16/
+> ```
+>
+> **Use the actual unique employee ID from the database as the folder identifier. Do not use the employee's name or phone number.**
+>
+> ### Upload behavior
+>
+> When a new employee uploads:
+>
+> * Profile picture → save it inside that employee's folder.
+> * Aadhaar document/image → save it inside the same employee's folder.
+> * Store the resulting ImageKit URL/file identifier in the database as required for fetching.
+> * The app should fetch the employee's images from this employee-specific ImageKit location.
+>
+> ### Profile picture replacement
+>
+> If an employee uploads a **new profile picture**:
+>
+> 1. Find the existing profile picture in that employee's ImageKit folder.
+> 2. Delete the old ImageKit file.
+> 3. Upload the new profile picture into the same employee folder.
+> 4. Update the database reference/URL to the new file.
+>
+> Do not leave old profile pictures orphaned in ImageKit.
+>
+> ### Employee deletion
+>
+> When Admin/Supervisor completely deletes an employee:
+>
+> 1. Delete the employee's database records according to the existing deletion flow.
+> 2. Delete the employee's **entire ImageKit folder**, including:
+>
+>    * Profile picture
+>    * Aadhaar document/image
+>    * Any other employee-specific files stored inside that folder.
+> 3. Only consider the deletion successful when the database deletion and required ImageKit cleanup are handled correctly.
+> 4. Do not leave orphaned employee files in ImageKit.
+>
+> ### Important
+>
+> * Do **not** break the existing React Native + Expo + Vercel API architecture.
+> * Keep ImageKit credentials strictly on the backend/server side. Never expose ImageKit private keys in the React Native app.
+> * Do not rely only on the database URL to identify files when the employee folder structure can be used.
+> * Make the folder/file naming deterministic and consistent.
+> * Handle cases where an employee has no profile picture or no Aadhaar image without failing the entire deletion.
+> * If ImageKit cleanup fails, log the actual error properly instead of silently ignoring it.
+> * Existing employees should also be handled safely. Do not break their currently stored image URLs. If migration is required, implement it carefully rather than assuming old files already exist in the new folder structure.
+>
+> **First inspect the existing ImageKit upload/delete implementation and database schema, then modify the current implementation instead of creating a separate parallel upload system.**

@@ -1,0 +1,49 @@
+Add a Refresh feature to the All Employees page.
+
+UI
+Add a refresh button/icon beside the Search bar.
+Keep the existing Search bar and employee list design unchanged.
+The refresh button should clearly indicate that it refreshes the employee list.
+Show a loading state on the refresh button while the employee data is being fetched.
+Refresh behavior
+
+When the Supervisor or Admin taps the Refresh button:
+
+Only the employee list/data section should reload.
+Do not reload the entire page.
+Do not navigate away from the current screen.
+Do not reset the search bar unnecessarily.
+Do not recreate/reload the whole screen.
+
+The refresh should fetch the latest employee data from the backend/database and replace the currently displayed employee list with the latest data.
+
+Changes that must appear after refresh
+
+The refresh must detect and display all latest employee changes, including:
+
+New employee account created
+If a new employee account is created elsewhere, tapping Refresh should fetch that employee and show the new employee in the list.
+New employee added
+If an employee profile is newly created/added, it should appear after Refresh.
+Employee details edited
+If an employee's name, phone number, site, role, profile picture, or other details are edited, the updated information must appear after Refresh.
+Employee deleted
+If an employee is deleted, tapping Refresh must remove that employee from the currently displayed list.
+Any other backend employee-data changes
+The employee list should always reflect the latest backend/database state after Refresh.
+Important implementation requirement
+
+Implement this as a data refresh, not a full-screen reload.
+
+Prefer:
+
+Refetching the employee API/query.
+Updating the employee-list state/cache with the fresh response.
+Preserving the existing screen, navigation state, UI state, and components.
+Reusing the existing employee-fetching logic/API instead of creating duplicate endpoints or duplicate data-fetching logic.
+
+The final behavior should be:
+
+Database changes → Supervisor/Admin taps Refresh → latest employee data is fetched → only employee list updates.
+
+Make sure this works reliably for employee creation, account creation, edits, profile-picture changes, and deletion.

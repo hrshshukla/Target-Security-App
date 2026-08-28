@@ -1,0 +1,57 @@
+Haan, Replit ko thoda detailed but clear prompt do, taaki woh **sirf download feature** implement kare aur existing Account Sheet ko disturb na kare:
+
+> **Implement the Account Sheet → Excel Download feature only. Do not implement Excel upload/import yet.**
+>
+> Add a **“Download Excel”** button below the existing scrollable Account Sheet table.
+>
+> ### Required behavior
+>
+> * The Account Sheet already has a **month selector** (previous/next month).
+> * The currently selected month is the source of truth.
+> * When the user clicks **Download Excel**, generate an `.xlsx` file containing **only the report for the currently selected month**.
+> * Example: if the screen currently shows **June 2026**, the downloaded file must be the **June 2026 Account Sheet**. If the user switches to July 2026, the same button must download the July 2026 report.
+> * Never hardcode a month.
+>
+> ### Excel structure
+>
+> The generated Excel file should closely match the Account Sheet table shown in the app:
+>
+> * Same column headings.
+> * Same row names/company names.
+> * Same values displayed for the selected month.
+> * Include the **TOTAL ALL** row and its calculated values.
+> * Keep the same column order as the UI.
+> * Preserve numeric values as actual Excel numbers wherever appropriate, rather than converting everything to plain text.
+> * Format the spreadsheet as a proper `.xlsx` file with readable column widths, headers, borders/alignment, and a clear total row.
+>
+> ### File naming
+>
+> Use a meaningful month-specific filename, for example:
+> `Account-Sheet-June-2026.xlsx`
+>
+> ### Important implementation requirements
+>
+> * Use the **same data/state/query already used to render the Account Sheet UI** so the downloaded report cannot differ from what the user is seeing.
+> * Do not create a separate hardcoded dataset for Excel.
+> * Make sure the selected month is correctly passed to the download/export logic.
+> * If the report data is fetched from the API, use the existing API/data layer instead of bypassing the existing architecture.
+> * Show a loading state on the **Download Excel** button while the file is being generated.
+> * Prevent multiple downloads if the button is tapped repeatedly while a download is in progress.
+> * After successful generation/download, show the app's existing **custom success popup**.
+> * If generation fails, show the existing **custom error popup**.
+>
+> ### Package
+>
+> Use a suitable React Native/Expo-compatible Excel generation/download solution (such as the appropriate `xlsx` + Expo file-sharing approach) and install only the packages actually required.
+>
+> ### Do NOT change
+>
+> * Existing Account Sheet UI/layout.
+> * Month selector behavior.
+> * Existing table scrolling.
+> * Existing API/database architecture.
+> * Expo Router/React Native architecture.
+> * Vercel API architecture.
+> * Any unrelated screens or features.
+>
+> **For now, implement only Excel DOWNLOAD. Do not add Excel UPLOAD/IMPORT functionality yet.**
