@@ -3,7 +3,14 @@ import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Pressable, StyleSheet, Text, TextInput, View, Image } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Image,
+} from "react-native";
 import {
   useDeleteEmployee,
   getListEmployeesQueryKey,
@@ -80,8 +87,7 @@ export default function EmployeeScreen() {
           employeeId={id}
           canEdit={
             user?.role === "ADMIN" ||
-            (user?.role === "SUPERVISOR" &&
-              employee.data.role !== "Supervisor")
+            (user?.role === "SUPERVISOR" && employee.data.role !== "Supervisor")
           }
         />
       ) : (
@@ -145,7 +151,7 @@ function DetailsTab({
       dateOfJoining: employee.dateOfJoining,
     };
     update.mutate(
-          { employeeId: String(employee.employeeId), data },
+      { employeeId: String(employee.employeeId), data },
       {
         onSuccess: () => {
           setEditing(false);
@@ -181,9 +187,14 @@ function DetailsTab({
           variant: "danger",
           onPress: async () => {
             try {
-              await remove.mutateAsync({ employeeId: String(employee.employeeId) });
+              await remove.mutateAsync({
+                employeeId: String(employee.employeeId),
+              });
               await queryClient.refetchQueries({
-                queryKey: getListEmployeesQueryKey(employee.companyId, undefined),
+                queryKey: getListEmployeesQueryKey(
+                  employee.companyId,
+                  undefined,
+                ),
               });
               hideModal();
               await new Promise((resolve) => setTimeout(resolve, 150));
@@ -191,13 +202,19 @@ function DetailsTab({
                 type: "success",
                 title: "Success",
                 message: "Employee deleted successfully.",
-                actions: [{
-                  label: "OK",
-                     onPress: () => router.back(),
-                }],
+                actions: [
+                  {
+                    label: "OK",
+                    onPress: () => router.back(),
+                  },
+                ],
               });
             } catch {
-              showModal({ type: "error", title: "Could not delete", message: "Try again." });
+              showModal({
+                type: "error",
+                title: "Could not delete",
+                message: "Try again.",
+              });
             }
             return false;
           },
@@ -237,7 +254,7 @@ function DetailsTab({
           keyboardType="phone-pad"
           prefix="+91"
         />
-    <Field label="Email (optional)" value={email} onChangeText={setEmail} />
+        <Field label="Email (optional)" value={email} onChangeText={setEmail} />
         <Field label="Site" value={site} onChangeText={setSite} />
         <PrimaryButton
           label={update.isPending ? "Saving..." : "Save changes"}
@@ -263,7 +280,10 @@ function DetailsTab({
       >
         <View style={styles.profileCardLeft}>
           <Info label="Name" value={employee.name} />
-          <Info label="Site" value={employee.site} />
+          <Info
+            label="Site"
+            value={employee.role === "Security Guard" ? employee.site : "All"}
+          />
           <Info
             label="Joining date"
             value={formatDateOnly(employee.dateOfJoining)}
@@ -273,7 +293,7 @@ function DetailsTab({
             accessibilityRole="link"
             accessibilityLabel={`Call ${phoneNumber}`}
           >
-          <Info label="Phone number" value={"+91 " + employee.contact} />
+            <Info label="Phone number" value={"+91 " + employee.contact} />
           </Pressable>
         </View>
 
@@ -299,7 +319,9 @@ function DetailsTab({
           Aadhaar document
         </Text>
         {aadhaar.isLoading ? (
-          <Text style={[styles.aadhaarMessage, { color: colors.mutedForeground }]}>
+          <Text
+            style={[styles.aadhaarMessage, { color: colors.mutedForeground }]}
+          >
             Loading Aadhaar document...
           </Text>
         ) : aadhaar.data?.imageUrl ? (
@@ -309,7 +331,9 @@ function DetailsTab({
             resizeMode="contain"
           />
         ) : (
-          <Text style={[styles.aadhaarMessage, { color: colors.mutedForeground }]}>
+          <Text
+            style={[styles.aadhaarMessage, { color: colors.mutedForeground }]}
+          >
             Aadhaar document not uploaded.
           </Text>
         )}
@@ -566,8 +590,7 @@ function SalaryTab({
     esic: Number(esic || data.esic),
   };
   const grossSalary = values.basicSalary + values.allowances + values.overtime;
-  const totalDeduction =
-    values.advance + values.fine + values.pf + values.esic;
+  const totalDeduction = values.advance + values.fine + values.pf + values.esic;
   const netSalary = grossSalary - totalDeduction;
   const save = () => {
     update.mutate(
@@ -584,7 +607,11 @@ function SalaryTab({
           void salary.refetch();
         },
         onError: () =>
-          showModal({ type: "error", title: "Salary not saved", message: "Check the values and try again." }),
+          showModal({
+            type: "error",
+            title: "Salary not saved",
+            message: "Check the values and try again.",
+          }),
       },
     );
   };
@@ -606,8 +633,18 @@ function SalaryTab({
       <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
         Earnings
       </Text>
-      <SalaryField label="Basic salary" value={basicSalary || String(data.basicSalary)} onChangeText={setBasicSalary} editable={canEdit} />
-      <SalaryField label="Allowances" value={allowances || String(data.allowances)} onChangeText={setAllowances} editable={canEdit} />
+      <SalaryField
+        label="Basic salary"
+        value={basicSalary || String(data.basicSalary)}
+        onChangeText={setBasicSalary}
+        editable={canEdit}
+      />
+      <SalaryField
+        label="Allowances"
+        value={allowances || String(data.allowances)}
+        onChangeText={setAllowances}
+        editable={canEdit}
+      />
       <SalaryField
         label="Overtime"
         value={overtime || String(data.overtime)}
@@ -620,9 +657,24 @@ function SalaryTab({
       <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
         Deductions
       </Text>
-      <SalaryField label="Advance" value={advance || String(data.advance)} onChangeText={setAdvance} editable={canEdit} />
-      <SalaryField label="Fine" value={fine || String(data.fine)} onChangeText={setFine} editable={canEdit} />
-      <SalaryField label="PF" value={pf || String(data.pf)} onChangeText={setPf} editable={canEdit} />
+      <SalaryField
+        label="Advance"
+        value={advance || String(data.advance)}
+        onChangeText={setAdvance}
+        editable={canEdit}
+      />
+      <SalaryField
+        label="Fine"
+        value={fine || String(data.fine)}
+        onChangeText={setFine}
+        editable={canEdit}
+      />
+      <SalaryField
+        label="PF"
+        value={pf || String(data.pf)}
+        onChangeText={setPf}
+        editable={canEdit}
+      />
       <SalaryField
         label="ESIC"
         value={esic || String(data.esic)}
@@ -765,7 +817,6 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
     paddingTop: 10,
     paddingRight: 20,
-
   },
   profileNumber: { ...fonts.regular, fontSize: 13, marginTop: 8 },
   info: { paddingVertical: 2 },
@@ -786,13 +837,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   actionStack: { gap: 11 },
-   aadhaarCard: {
+  aadhaarCard: {
     borderRadius: 18,
     borderWidth: 1,
-    padding: 15,
-    marginBottom: 24,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginBottom: 20,
   },
-  aadhaarTitle: { ...fonts.bold, fontSize: 16, marginBottom: 10 },
+  aadhaarTitle: { ...fonts.bold, fontSize: 16 },
   aadhaarImage: {
     width: "100%",
     height: 220,
